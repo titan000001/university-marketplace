@@ -98,6 +98,30 @@
                 <p class="stat-number">1,250</p>
             </div>
         </section>
+
+        <section id="services-section" class="marketplace-section">
+            <div class="marketplace-header">
+                <div>
+                    <h2>Active Campus Listings</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">Browse and search items uploaded by students around campus.</p>
+                </div>
+                <div class="marketplace-controls">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="search" id="search-bar" class="search-input" placeholder="Search textbooks, calculators, apparel...">
+                    </div>
+                    <select id="category-filter" class="category-select">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+            </div>
+            <div id="products-grid" class="products-grid">
+                <div class="offline-notice">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h5>Loading marketplace items...</h5>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer class="app-footer">
@@ -120,5 +144,75 @@
         </div>
     </footer>
 
-    </body>
+    <div id="toast-container" class="toast-container"></div>
+    <script>
+        const placeholderProducts = [
+            { id: 'demo-1', title: 'Engineering Physics Textbook', price: '45.00', image_url: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=400', sellerName: 'Tawhidul', categories: 'Textbooks' },
+            { id: 'demo-2', title: 'TI-84 Plus Calculator', price: '85.50', image_url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=400', sellerName: 'Purnota', categories: 'Electronics' },
+            { id: 'demo-3', title: 'Study Desk Lamp', price: '15.00', image_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400', sellerName: 'Hiya', categories: 'Furniture' },
+            { id: 'demo-4', title: 'Ergonomic Office Chair', price: '60.00', image_url: 'https://images.unsplash.com/photo-1580481072645-022f9a6dbf27?auto=format&fit=crop&q=80&w=400', sellerName: 'Sabir', categories: 'Furniture' }
+        ];
+
+        const mockCategories = [
+            { id: 'cat-1', name: 'Textbooks' }, { id: 'cat-2', name: 'Electronics' },
+            { id: 'cat-3', name: 'Furniture' }, { id: 'cat-4', name: 'Clothing' }
+        ];
+
+        function toast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-circle-check' : 'fa-circle-info'}"></i> <span>${message}</span>`;
+            container.appendChild(t);
+            setTimeout(() => t.classList.add('show'), 50);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-bar');
+            const categoryFilter = document.getElementById('category-filter');
+            const productsGrid = document.getElementById('products-grid');
+            
+            categoryFilter.innerHTML += mockCategories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+            function render(term = '', catId = '') {
+                let items = placeholderProducts;
+                if (term) items = items.filter(i => i.title.toLowerCase().includes(term.toLowerCase()));
+                if (catId) {
+                    const catName = mockCategories.find(c => c.id === catId).name;
+                    items = items.filter(i => i.categories === catName);
+                }
+
+                document.getElementById('listings-count').innerText = items.length;
+
+                if (!items.length) {
+                    productsGrid.innerHTML = `<div class="offline-notice"><h5>No matches found</h5></div>`;
+                    return;
+                }
+
+                productsGrid.innerHTML = items.map(item => `
+                    <article class="product-card">
+                        <div class="product-image-container"><img class="product-image" src="${item.image_url}"></div>
+                        <div class="product-details">
+                            <h4>${item.title}</h4>
+                            <div class="product-price">$${parseFloat(item.price).toFixed(2)}</div>
+                            <div class="product-tags"><span class="product-tag">${item.categories}</span></div>
+                            <div class="product-actions">
+                                <button class="btn-sm btn-outline btn-contact" data-seller="${item.sellerName}">Contact</button>
+                                <button class="btn-sm btn-filled-accent btn-action" data-title="${item.title}">Buy Now</button>
+                            </div>
+                        </div>
+                    </article>
+                `).join('');
+
+                document.querySelectorAll('.btn-contact').forEach(b => b.onclick = () => toast(`Contacting: ${b.dataset.seller}`, 'info'));
+                document.querySelectorAll('.btn-action').forEach(b => b.onclick = () => toast(`Buying: ${b.dataset.title}`, 'success'));
+            }
+
+            searchInput.oninput = () => render(searchInput.value, categoryFilter.value);
+            categoryFilter.onchange = () => render(searchInput.value, categoryFilter.value);
+            render();
+        });
+    </script>
+</body>
 </html>
