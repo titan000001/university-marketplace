@@ -1,3 +1,18 @@
-# Ignore Roadmaps directory
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.local
+
+# Databases and temporary files
+*.sqlite
+*.log
+
+# Roadmaps directory
 Roadmaps/
 roadmaps/
+
+# System files
+.DS_Store
+Thumbs.db
