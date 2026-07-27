@@ -1,24 +1,107 @@
 document.addEventListener('DOMContentLoaded', () => {
     const appNode = document.getElementById('app');
 
-    if (appNode) {
-        appNode.innerHTML = `
-            <div class="dashboard-wrapper">
-                <!-- Phase 6: Hero Banner & Welcome Section (Lead Developer: Hiya Moni) -->
-                <section class="banner-section">
-                    <h1>Welcome, Student</h1>
-                    <p>Buy and sell textbooks, electronics, study furniture, and other gear safely. Here is your campus hub performance index for today.</p>
-                    <div class="banner-buttons">
-                        <button id="browse-btn" class="btn btn-primary" onclick="alert('Navigating to marketplace listings...')">
-                            <i class="fas fa-shopping-bag"></i> Browse Items
-                        </button>
-                        <a href="#/sell" class="btn btn-secondary">
-                            <i class="fas fa-tags"></i> Start Selling
-                        </a>
+    if (!appNode) return;
+
+    // 1. Afia Lubna Purnota & Hiya Moni: Registration Form + Password Strength Meter HTML Template
+    appNode.innerHTML = `
+        <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                <div>
+                    <h2 class="mt-2 text-center text-3xl font-extrabold text-gray-900">
+                        Create your account
+                    </h2>
+                    <p class="mt-2 text-center text-sm text-gray-600">
+                        Join UniMarket campus community
+                    </p>
+                </div>
+                <form id="registration-form" class="mt-8 space-y-6">
+                    <div class="rounded-md shadow-sm space-y-4">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                            <input id="email" name="email" type="email" autocomplete="email" required 
+                                class="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
+                                placeholder="student@university.edu">
+                            <p id="email-error" class="hidden text-xs text-red-500 mt-1">Please enter a valid email address.</p>
+                        </div>
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input id="password" name="password" type="password" autocomplete="new-password" required 
+                                class="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
+                                placeholder="••••••••">
+                            
+                            <!-- Hiya Moni: Password Strength Meter (#strength-meter & #strength-text) -->
+                            <div class="mt-2">
+                                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                                    <div id="strength-meter" class="h-full bg-red-500 w-0 transition-all duration-300"></div>
+                                </div>
+                                <p id="strength-text" class="text-xs text-gray-500 mt-1">Password strength: Weak</p>
+                            </div>
+                        </div>
                     </div>
-                </section>
+
+                    <div>
+                        <button type="submit" id="submit-btn" 
+                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                            Register
+                        </button>
+                    </div>
+                </form>
             </div>
-        `;
+        </div>
+    `;
+
+    // 4. MD. Tawhidul Islam: Secure DOM Element Caching & Event Mechanics
+    const registrationForm = document.getElementById('registration-form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const strengthMeter = document.getElementById('strength-meter');
+    const strengthText = document.getElementById('strength-text');
+    const emailError = document.getElementById('email-error');
+
+    // RegEx Email Validator
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Real-time Email Input Event Listener
+    if (emailInput) {
+        emailInput.addEventListener('input', () => {
+            const isValid = emailRegex.test(emailInput.value.trim());
+            if (emailInput.value.trim() === '' || isValid) {
+                if (emailError) emailError.classList.add('hidden');
+                emailInput.classList.remove('border-red-500');
+            } else {
+                if (emailError) emailError.classList.remove('hidden');
+                emailInput.classList.add('border-red-500');
+            }
+        });
+    }
+
+    // Real-time Password Strength Listener
+    if (passwordInput) {
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            const score = calculatePasswordScore(password);
+            updatePasswordStrengthUI(score, strengthMeter, strengthText);
+        });
+    }
+
+    // Submit Event Listener with preventDefault & State Validation
+    if (registrationForm) {
+        registrationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = emailInput ? emailInput.value.trim() : '';
+            const password = passwordInput ? passwordInput.value : '';
+            const isEmailValid = emailRegex.test(email);
+            const isPasswordValid = password.length >= 6;
+
+            if (isEmailValid && isPasswordValid) {
+                // Trigger Hiya Moni's Success UI Component
+                renderSuccessUI(appNode, email);
+            } else {
+                alert('Please enter a valid email and password (minimum 6 characters) before submitting.');
+            }
+        });
     }
 
     // Render Sabir Rahman's statistics section
@@ -26,16 +109,53 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// Sabir Rahman's Declarative Component (Week 3)
+// 2. Hiya Moni: Password Strength & Success UI State (Week 3)
 // ==========================================
 
-/**
- * Declarative Component Function: StatsCardComponent
- * @param {string} title - The metric title
- * @param {number|string} count - The statistical count
- * @param {string} statusColor - Tailwind text color class identifier
- * @returns {string} Styled HTML template literal
- */
+function calculatePasswordScore(password) {
+    let score = 0;
+    if (!password) return 0;
+    if (password.length >= 6) score += 1;
+    if (password.length >= 10) score += 1;
+    if (/[A-Z]/.test(password) && /[0-9]/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+    return score;
+}
+
+function updatePasswordStrengthUI(score, meterNode, textNode) {
+    if (!meterNode || !textNode) return;
+
+    const widthClasses = ['w-0', 'w-1/4', 'w-2/4', 'w-3/4', 'w-full'];
+    const colorClasses = ['bg-red-500', 'bg-red-500', 'bg-yellow-500', 'bg-yellow-500', 'bg-green-500'];
+    const labels = ['Too short', 'Weak', 'Fair', 'Good', 'Strong'];
+
+    meterNode.className = `h-full ${widthClasses[score]} ${colorClasses[score]} transition-all duration-300`;
+    textNode.textContent = `Password strength: ${labels[score]}`;
+}
+
+function renderSuccessUI(containerNode, userEmail) {
+    if (!containerNode) return;
+    containerNode.innerHTML = `
+        <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md w-full bg-white p-8 rounded-xl shadow-md border border-gray-100 text-center space-y-4">
+                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">Registration Successful!</h2>
+                <p class="text-gray-600 text-sm">Welcome to UniMarket! A confirmation notification has been sent to <strong class="text-gray-800">${userEmail}</strong>.</p>
+                <button onclick="window.location.reload()" class="mt-4 w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md transition">
+                    Back to Register
+                </button>
+            </div>
+        </div>
+    `;
+    renderStatsSection();
+}
+
+// ==========================================
+// 3. Sabir Rahman: Declarative Component (Week 3)
+// ==========================================
+
 function StatsCardComponent(title, count, statusColor = 'indigo-600') {
     const colorClass = statusColor.startsWith('text-') ? statusColor : `text-${statusColor}`;
     return `
@@ -46,19 +166,12 @@ function StatsCardComponent(title, count, statusColor = 'indigo-600') {
     `;
 }
 
-// Array of statistics objects
 const uniMarketStats = [
     { title: 'Total Listings', count: 45, statusColor: 'indigo-600' },
     { title: 'Active Deals', count: 120, statusColor: 'emerald-600' },
     { title: 'Verified Users', count: '1,250', statusColor: 'blue-600' }
 ];
 
-/**
- * Function: renderStatsSection
- * Creates a parent div with responsive CSS Grid (grid-cols-1 md:grid-cols-3),
- * iterates over uniMarketStats using .map(), passes data into StatsCardComponent,
- * and appends the result to #app.
- */
 function renderStatsSection() {
     const appNode = document.getElementById('app');
     if (!appNode) return;
