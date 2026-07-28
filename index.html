@@ -6,7 +6,11 @@
     <meta http-equiv="refresh" content="0;url=/public/index.html">
     <title>UniMarket - Campus Marketplace</title>
     <script>
-        window.location.replace('/public/index.html');
+        if (window.location.protocol === 'file:') {
+            window.location.href = 'http://localhost:3000/home.html';
+        } else {
+            window.location.replace('/home.html');
+        }
     </script>
 </head>
 <body>

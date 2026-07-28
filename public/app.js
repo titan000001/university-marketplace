@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = emailInput ? emailInput.value.trim() : '';
             const password = passwordInput ? passwordInput.value : '';
             const isEmailValid = emailRegex.test(email);
-            const isPasswordValid = password.length >= 6;
+            const isPasswordValid = password.length >= 8;
 
             if (!isEmailValid) {
                 if (emailError) emailError.classList.remove('hidden');
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 renderSuccessUI(appNode, email);
             } else {
-                alert('Please enter a valid email address and password (minimum 6 characters).');
+                alert('Please enter a valid email address and password (minimum 8 characters).');
             }
         });
     }
